@@ -1,0 +1,98 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    // Temporarily remove kapt plugin
+    // id 'kotlin-kapt'
+    // Temporarily remove Hilt plugin
+    // id 'dagger.hilt.android.plugin'
+}
+
+android {
+    namespace 'com.clockapp'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.clockapp"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs += [
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-P", "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+        ]
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.0.5'  // Compatible with Kotlin 1.5.31
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.12.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    implementation platform('androidx.compose:compose-bom:2023.10.01')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.ui:ui-graphics'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-extended'
+    
+    // Hilt for dependency injection - temporarily disabled
+    // implementation 'com.google.dagger:hilt-android:2.38.1'
+    // kapt 'com.google.dagger:hilt-compiler:2.38.1'
+    // implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+    
+    // Room database - temporarily disabled
+    // implementation "androidx.room:room-runtime:2.6.1"
+    // implementation "androidx.room:room-ktx:2.6.1"
+    // kapt "androidx.room:room-compiler:2.6.1"
+    
+    // ViewModel and LiveData
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    
+    // Navigation
+    implementation 'androidx.navigation:navigation-compose:2.7.6'
+    
+    // WorkManager for alarm scheduling
+    implementation 'androidx.work:work-runtime-ktx:2.9.0'
+    
+    // Permission handling
+    implementation 'com.google.accompanist:accompanist-permissions:0.32.0'
+    
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation platform('androidx.compose:compose-bom:2023.10.01')
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
+}

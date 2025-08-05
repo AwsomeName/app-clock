@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">闹钟</string>
+    
+    <!-- 主界面 -->
+    <string name="tab_alarm">闹钟</string>
+    <string name="tab_clock">时钟</string>
+    <string name="tab_timer">计时器</string>
+    <string name="tab_stopwatch">秒表</string>
+    <string name="add_alarm">添加闹钟</string>
+    <string name="no_alarms">暂无闹钟</string>
+    <string name="alarm_save">保存</string>
+    <string name="alarm_delete">删除</string>
+    <string name="alarm_cancel">取消</string>
+    <string name="alarm_repeat">重复</string>
+    <string name="alarm_label">标签</string>
+    <string name="alarm_vibrate">振动</string>
+    <string name="alarm_ringtone">铃声</string>
+    <string name="alarm_snooze">延迟</string>
+    <string name="alarm_snooze_duration">延迟间隔</string>
+    <string name="alarm_snooze_times">延迟次数</string>
+    
+    <!-- 重复日选择 -->
+    <string name="monday">周一</string>
+    <string name="tuesday">周二</string>
+    <string name="wednesday">周三</string>
+    <string name="thursday">周四</string>
+    <string name="friday">周五</string>
+    <string name="saturday">周六</string>
+    <string name="sunday">周日</string>
+    <string name="every_day">每天</string>
+    <string name="weekdays">工作日</string>
+    <string name="weekends">周末</string>
+    
+    <!-- 闹钟响铃界面 -->
+    <string name="alarm_dismiss">关闭</string>
+    <string name="alarm_snooze_button">延迟</string>
+    <string name="alarm_snoozed">已延迟 %1$d 分钟</string>
+    
+    <!-- 错误提示 -->
+    <string name="error_save_alarm">保存闹钟失败</string>
+    <string name="error_delete_alarm">删除闹钟失败</string>
+    <string name="error_update_alarm">更新闹钟失败</string>
+    
+    <!-- 权限 -->
+    <string name="permission_notification_title">通知权限</string>
+    <string name="permission_notification_message">需要通知权限来显示闹钟提醒</string>
+    <string name="permission_alarm_title">闹钟权限</string>
+    <string name="permission_alarm_message">需要闹钟权限来设置精确的闹钟提醒</string>
+    <string name="permission_required">需要权限</string>
+    <string name="permission_grant">授权</string>
+    <string name="permission_settings">设置</string>
+    
+    <!-- 铃声选择 -->
+    <string name="ringtone_default">默认铃声</string>
+    <string name="ringtone_rising">渐强铃声</string>
+    <string name="ringtone_gentle">柔和铃声</string>
+    <string name="ringtone_classic">经典铃声</string>
+    <string name="ringtone_digital">数字铃声</string>
+</resources>

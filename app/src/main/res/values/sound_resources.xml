@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 铃声资源配置 -->
+    <string-array name="ringtone_names">
+        <item>默认铃声</item>
+        <item>轻松铃声</item>
+        <item>活力铃声</item>
+        <item>静音</item>
+    </string-array>
+    
+    <string-array name="ringtone_values">
+        <item>default_ringtone</item>
+        <item>calm_ringtone</item>
+        <item>energetic_ringtone</item>
+        <item>silent</item>
+    </string-array>
+    
+    <!-- 铃声描述 -->
+    <string-array name="ringtone_descriptions">
+        <item>标准闹钟铃声</item>
+        <item>舒缓的唤醒音乐</item>
+        <item>有活力的唤醒音乐</item>
+        <item>仅使用振动，无声音</item>
+    </string-array>
+</resources>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 基础主题 -->
+    <style name="Theme.ClockApp" parent="android:Theme.Material.Light.NoActionBar" />
+    
+    <!-- 闹钟响铃主题，允许在锁屏上显示 -->
+    <style name="Theme.ClockApp.AlarmRinging" parent="Theme.ClockApp">
+        <item name="android:windowShowWallpaper">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

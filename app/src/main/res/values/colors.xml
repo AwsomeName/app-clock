@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#FF3700B3</color>
+    <color name="primary_dark">#FF3700B3</color>
+    <color name="primary_variant">#FF3700B3</color>
+    <color name="secondary">#FF03DAC5</color>
+    <color name="secondary_variant">#FF018786</color>
+    <color name="background">#FFFFFFFF</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="error">#FFB00020</color>
+    <color name="on_primary">#FFFFFFFF</color>
+    <color name="on_secondary">#FF000000</color>
+    <color name="on_background">#FF000000</color>
+    <color name="on_surface">#FF000000</color>
+    <color name="on_error">#FFFFFFFF</color>
+    
+    <!-- 应用特定颜色 -->
+    <color name="alarm_active">#FF3700B3</color>
+    <color name="alarm_inactive">#FF757575</color>
+    <color name="alarm_snooze">#FFFFAB00</color>
+    <color name="alarm_dismiss">#FFB00020</color>
+    <color name="time_text_color">#FF000000</color>
+    <color name="label_text_color">#FF757575</color>
+</resources>
