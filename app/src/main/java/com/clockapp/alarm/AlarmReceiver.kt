@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
+import com.clockapp.service.AlarmService
 import com.clockapp.ui.alarm.AlarmRingingActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +13,7 @@ import kotlinx.coroutines.launch
 class AlarmReceiver : BroadcastReceiver() {
     
     companion object {
+        const val ACTION_ALARM = "com.clockapp.action.ALARM"
         const val EXTRA_ALARM_ID = "alarm_id"
         const val EXTRA_ALARM_LABEL = "alarm_label"
         const val EXTRA_ALARM_RINGTONE_URI = "alarm_ringtone_uri"
@@ -55,11 +57,12 @@ class AlarmReceiver : BroadcastReceiver() {
         
         // 启动闹钟服务
         val serviceIntent = Intent(context, AlarmService::class.java).apply {
-            putExtra(EXTRA_ALARM_ID, alarmId)
-            putExtra(EXTRA_ALARM_LABEL, alarmLabel)
-            putExtra(EXTRA_ALARM_RINGTONE_URI, ringtoneUri)
-            putExtra(EXTRA_ALARM_VIBRATE, vibrate)
-            putExtra(EXTRA_ALARM_VOLUME, volume)
+            action = AlarmService.ACTION_START_ALARM
+            putExtra(AlarmService.EXTRA_ALARM_ID, alarmId)
+            putExtra(AlarmService.EXTRA_ALARM_LABEL, alarmLabel)
+            putExtra(AlarmService.EXTRA_ALARM_RINGTONE_URI, ringtoneUri)
+            putExtra(AlarmService.EXTRA_ALARM_VIBRATE, vibrate)
+            putExtra(AlarmService.EXTRA_ALARM_VOLUME, volume)
         }
         
         context.startForegroundService(serviceIntent)

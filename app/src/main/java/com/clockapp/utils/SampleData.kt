@@ -8,7 +8,7 @@ import java.time.LocalTime
  * 用于开发和测试的示例闹钟数据
  */
 object SampleData {
-    
+
     /**
      * 生成一系列示例闹钟数据
      */
@@ -19,49 +19,40 @@ object SampleData {
                 hour = 7,
                 minute = 30,
                 label = "起床闹钟",
-                enabled = true,
-                repeatDays = listOf(1, 2, 3, 4, 5), // 工作日
+                isEnabled = true,
+                repeatDays = setOf(1, 2, 3, 4, 5), // 工作日
                 vibrate = true,
-                ringtoneName = "默认铃声",
                 ringtoneUri = "android.resource://com.clockapp/raw/default_alarm",
                 snoozeEnabled = true,
-                snoozeDuration = 5,
-                nextAlarmTime = LocalDateTime.now().plusDays(1)
-                    .withHour(7).withMinute(30).withSecond(0)
+                snoozeDuration = 5
             ),
             Alarm(
                 id = 2,
                 hour = 9,
                 minute = 0,
                 label = "晨会提醒",
-                enabled = true,
-                repeatDays = listOf(1, 3, 5), // 周一、周三、周五
+                isEnabled = true,
+                repeatDays = setOf(1, 3, 5), // 周一、周三、周五
                 vibrate = false,
-                ringtoneName = "轻松铃声",
                 ringtoneUri = "android.resource://com.clockapp/raw/gentle_alarm",
                 snoozeEnabled = false,
-                snoozeDuration = 0,
-                nextAlarmTime = LocalDateTime.now().plusDays(2)
-                    .withHour(9).withMinute(0).withSecond(0)
+                snoozeDuration = 0
             ),
             Alarm(
                 id = 3,
                 hour = 22,
                 minute = 0,
                 label = "睡前提醒",
-                enabled = true,
-                repeatDays = listOf(0, 1, 2, 3, 4, 5, 6), // 每天
+                isEnabled = true,
+                repeatDays = setOf(0, 1, 2, 3, 4, 5, 6), // 每天
                 vibrate = true,
-                ringtoneName = "活力铃声",
                 ringtoneUri = "android.resource://com.clockapp/raw/energetic_alarm",
                 snoozeEnabled = true,
-                snoozeDuration = 10,
-                nextAlarmTime = LocalDateTime.now()
-                    .withHour(22).withMinute(0).withSecond(0)
+                snoozeDuration = 10
             )
         )
     }
-    
+
     /**
      * 创建新的空闹钟对象，使用当前时间作为初始值
      */
@@ -72,14 +63,12 @@ object SampleData {
             hour = now.hour,
             minute = now.minute,
             label = "",
-            enabled = true,
-            repeatDays = emptyList(),
+            isEnabled = true,
+            repeatDays = emptySet(),
             vibrate = true,
-            ringtoneName = "默认铃声",
             ringtoneUri = "android.resource://com.clockapp/raw/default_alarm",
             snoozeEnabled = true,
-            snoozeDuration = 5,
-            nextAlarmTime = null
+            snoozeDuration = 5
         )
     }
 }

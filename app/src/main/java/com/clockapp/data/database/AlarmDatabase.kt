@@ -15,13 +15,13 @@ import kotlinx.coroutines.launch
     exportSchema = false
 )
 abstract class AlarmDatabase : RoomDatabase() {
-    
+
     abstract fun alarmDao(): AlarmDao
-    
+
     companion object {
         @Volatile
         private var INSTANCE: AlarmDatabase? = null
-        
+
         fun getDatabase(context: Context): AlarmDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
@@ -35,9 +35,9 @@ abstract class AlarmDatabase : RoomDatabase() {
                 instance
             }
         }
-        
+
         private class AlarmDatabaseCallback : RoomDatabase.Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
+            override fun onCreate(db: RoomDatabase) {
                 super.onCreate(db)
                 // 可以在这里添加一些默认数据
             }
@@ -50,7 +50,7 @@ class Converters {
     fun fromIntSet(value: Set<Int>): String {
         return value.joinToString(",")
     }
-    
+
     @TypeConverter
     fun toIntSet(value: String): Set<Int> {
         return if (value.isEmpty()) {

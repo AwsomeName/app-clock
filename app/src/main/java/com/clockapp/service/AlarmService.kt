@@ -1,10 +1,6 @@
 package com.clockapp.service
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.Service
+import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
@@ -12,248 +8,205 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.media.RingtoneManager
 import android.net.Uri
+import android.os.*
 import android.os.Build
-import android.os.IBinder
-import android.os.PowerManager
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
+import com.clockapp.MainActivity
 import com.clockapp.R
-import com.clockapp.data.model.Alarm
 import com.clockapp.ui.alarm.AlarmRingingActivity
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.IOException
 
 class AlarmService : Service() {
+
+    companion object {
+        private const val NOTIFICATION_ID = 1
+        private const val CHANNEL_ID = "alarm_notification_channel"
+        const val ACTION_START_ALARM = "start_alarm"
+        const val ACTION_STOP_ALARM = "stop_alarm"
+        const val ACTION_SNOOZE_ALARM = "snooze_alarm"
+        const val EXTRA_ALARM_ID = "alarm_id"
+        const val EXTRA_ALARM_LABEL = "alarm_label"
+        const val EXTRA_ALARM_RINGTONE_URI = "alarm_ringtone_uri"
+        const val EXTRA_ALARM_VIBRATE = "alarm_vibrate"
+        const val EXTRA_ALARM_VOLUME = "alarm_volume"
+    }
+
     private var mediaPlayer: MediaPlayer? = null
     private var vibrator: Vibrator? = null
-    private var wakeLock: PowerManager.WakeLock? = null
-    private var alarm: Alarm? = null
-    
+    private val handler = Handler(Looper.getMainLooper())
+    private var alarmId: Long = -1
+    private var alarmLabel: String = ""
+    private var ringtoneUri: String? = null
+    private var vibrate: Boolean = true
+    private var volume: Int = 50
+
     override fun onCreate() {
         super.onCreate()
-        
-        // 初始化震动器
-        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-            vibratorManager.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-        }
-        
-        // 获取唤醒锁，确保CPU在屏幕关闭时继续运行
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(
-            PowerManager.PARTIAL_WAKE_LOCK,
-            "ClockApp:AlarmServiceWakeLock"
-        )
-        wakeLock?.acquire(10 * 60 * 1000L) // 10分钟后自动释放
+        createNotificationChannel()
+        vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator?
     }
-    
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        when (intent?.action) {
+
+    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        when (intent.action) {
             ACTION_START_ALARM -> {
-                val alarmJson = intent.getStringExtra(EXTRA_ALARM)
-                alarmJson?.let {
-                    alarm = Json.decodeFromString<Alarm>(it)
-                    startForeground(NOTIFICATION_ID, createNotification())
-                    startAlarm()
-                    showAlarmActivity()
-                }
+                alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1)
+                alarmLabel = intent.getStringExtra(EXTRA_ALARM_LABEL) ?: ""
+                ringtoneUri = intent.getStringExtra(EXTRA_ALARM_RINGTONE_URI)
+                vibrate = intent.getBooleanExtra(EXTRA_ALARM_VIBRATE, true)
+                volume = intent.getIntExtra(EXTRA_ALARM_VOLUME, 50)
+
+                startAlarm()
+                showAlarmNotification()
             }
             ACTION_STOP_ALARM -> {
                 stopAlarm()
-                stopForeground(true)
                 stopSelf()
             }
             ACTION_SNOOZE_ALARM -> {
                 stopAlarm()
-                // 处理推迟逻辑在AlarmRingingActivity中实现
-                stopForeground(true)
+                // 实现贪睡功能
+                snoozeAlarm()
                 stopSelf()
             }
         }
         return START_STICKY
     }
-    
-    private fun createNotification(): Notification {
-        val channelId = createNotificationChannel()
-        
-        val fullScreenIntent = Intent(this, AlarmRingingActivity::class.java).apply {
-            action = Intent.ACTION_MAIN
-            addCategory(Intent.CATEGORY_LAUNCHER)
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            
-            // 传递闹钟数据
-            alarm?.let {
-                putExtra(AlarmRingingActivity.EXTRA_ALARM, Json.encodeToString(it))
-            }
-        }
-        
-        val fullScreenPendingIntent = PendingIntent.getActivity(
-            this, 0, fullScreenIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        
-        return NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_alarm_ringing)
-            .setContentTitle(getString(R.string.alarm_ringing))
-            .setContentText(alarm?.label ?: getString(R.string.alarm))
-            .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setFullScreenIntent(fullScreenPendingIntent, true)
-            .setOngoing(true)
-            .setAutoCancel(false)
-            .build()
-    }
-    
-    private fun createNotificationChannel(): String {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = CHANNEL_ID
-            val channelName = getString(R.string.alarm_notification_channel)
-            val channel = NotificationChannel(
-                channelId,
-                channelName,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                enableVibration = true
-                enableLights(true)
-                setBypassDnd(true)
-                setShowBadge(true)
-            }
-            
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
-            return channelId
-        }
-        return ""
-    }
-    
+
     private fun startAlarm() {
         // 播放铃声
-        startRingtone()
-        
-        // 开始震动
-        alarm?.let {
-            if (it.vibrate) {
-                startVibration()
-            }
+        playRingtone()
+
+        // 震动
+        if (vibrate) {
+            startVibration()
         }
+
+        // 启动闹钟响铃Activity
+        val alarmIntent = Intent(this, AlarmRingingActivity::class.java)
+        alarmIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        alarmIntent.putExtra(EXTRA_ALARM_ID, alarmId)
+        alarmIntent.putExtra(EXTRA_ALARM_LABEL, alarmLabel)
+        startActivity(alarmIntent)
     }
-    
-    private fun startRingtone() {
-        mediaPlayer?.release()
-        mediaPlayer = MediaPlayer()
-        mediaPlayer?.setAudioAttributes(
-            AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .build()
-        )
-        
+
+    private fun playRingtone() {
         try {
-            // 获取铃声URI
-            val ringtoneUri = if (alarm?.ringtoneUri.isNullOrEmpty()) {
-                // 如果未设置铃声，使用默认铃声
-                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            mediaPlayer = MediaPlayer()
+
+            // 设置铃声来源
+            val uri: Uri? = if (ringtoneUri != null) {
+                Uri.parse(ringtoneUri)
             } else {
-                Uri.parse(alarm?.ringtoneUri)
+                RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             }
-            
-            // 特殊处理：静音选项
-            if (ringtoneUri.toString().endsWith("silent")) {
-                // 不播放声音
-                return
-            }
-            
-            mediaPlayer?.apply {
-                setDataSource(applicationContext, ringtoneUri)
-                isLooping = true
-                prepare()
-                start()
+
+            if (uri != null) {
+                mediaPlayer?.setDataSource(this, uri)
+
+                // 设置音频属性
+                val audioAttributes = AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build()
+                mediaPlayer?.setAudioAttributes(audioAttributes)
+
+                // 设置音量
+                val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM)
+                val adjustedVolume = (maxVolume * (volume / 100f)).toInt()
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_ALARM,
+                    adjustedVolume,
+                    0
+                )
+
+                mediaPlayer?.prepare()
+                mediaPlayer?.isLooping = true
+                mediaPlayer?.start()
             }
         } catch (e: IOException) {
             e.printStackTrace()
-            // 如果指定的铃声无法播放，使用默认铃声
-            try {
-                val defaultUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                mediaPlayer?.apply {
-                    reset()
-                    setDataSource(applicationContext, defaultUri)
-                    isLooping = true
-                    prepare()
-                    start()
-                }
-            } catch (ex: IOException) {
-                ex.printStackTrace()
-            }
         }
     }
-    
+
     private fun startVibration() {
-        val pattern = longArrayOf(0, 800, 800, 800) // 震动模式：800ms震动，800ms停止
-        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val effect = VibrationEffect.createWaveform(pattern, 0) // 重复从索引0开始
-            vibrator?.vibrate(effect)
+            val vibrationPattern = longArrayOf(0, 1000, 1000)
+            vibrator?.vibrate(
+                VibrationEffect.createWaveform(vibrationPattern, 0),
+                null
+            )
         } else {
+            // 旧版本API
             @Suppress("DEPRECATION")
-            vibrator?.vibrate(pattern, 0) // 重复从索引0开始
+            vibrator?.vibrate(longArrayOf(0, 1000, 1000), 0)
         }
     }
-    
+
     private fun stopAlarm() {
-        // 停止媒体播放
-        mediaPlayer?.apply {
-            if (isPlaying) {
-                stop()
-            }
-            release()
-        }
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
         mediaPlayer = null
-        
-        // 停止振动
+
         vibrator?.cancel()
     }
-    
-    private fun showAlarmActivity() {
-        // 启动全屏活动显示闹钟响铃界面
-        val fullScreenIntent = Intent(this, AlarmRingingActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            
-            // 传递闹钟数据
-            alarm?.let {
-                putExtra(AlarmRingingActivity.EXTRA_ALARM, Json.encodeToString(it))
-            }
-        }
-        startActivity(fullScreenIntent)
+
+    private fun snoozeAlarm() {
+        // 这里实现贪睡逻辑，例如10分钟后再次响铃
+        // 可以使用AlarmManager设置一个新的闹钟
     }
-    
-    override fun onDestroy() {
-        stopAlarm()
-        wakeLock?.let {
-            if (it.isHeld) {
-                it.release()
-            }
+
+    private fun showAlarmNotification() {
+        val stopIntent = Intent(this, AlarmService::class.java).apply {
+            action = ACTION_STOP_ALARM
         }
-        super.onDestroy()
+        val stopPendingIntent = PendingIntent.getService(
+            this,
+            0,
+            stopIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val snoozeIntent = Intent(this, AlarmService::class.java).apply {
+            action = ACTION_SNOOZE_ALARM
+        }
+        val snoozePendingIntent = PendingIntent.getService(
+            this,
+            1,
+            snoozeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_alarm_ringing)
+            .setContentTitle("闹钟响铃")
+            .setContentText(alarmLabel)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .addAction(R.drawable.ic_alarm_off, "关闭", stopPendingIntent)
+            .addAction(R.drawable.ic_snooze, "贪睡", snoozePendingIntent)
+            .setAutoCancel(false)
+            .build()
+
+        startForeground(NOTIFICATION_ID, notification)
     }
-    
-    override fun onBind(intent: Intent?): IBinder? = null
-    
-    companion object {
-        private const val NOTIFICATION_ID = 1
-        private const val CHANNEL_ID = "alarm_service_channel"
-        
-        const val EXTRA_ALARM = "extra_alarm"
-        
-        const val ACTION_START_ALARM = "com.clockapp.ACTION_START_ALARM"
-        const val ACTION_STOP_ALARM = "com.clockapp.ACTION_STOP_ALARM"
-        const val ACTION_SNOOZE_ALARM = "com.clockapp.ACTION_SNOOZE_ALARM"
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = "闹钟通知"
+            val descriptionText = "用于闹钟响铃的通知"
+            val importance = NotificationManager.IMPORTANCE_HIGH
+            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+                setSound(null, null)
+            }
+            // 注册渠道
+            val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    override fun onBind(intent: Intent): IBinder? {
+        return null
     }
 }

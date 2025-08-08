@@ -66,7 +66,7 @@
         
         <!-- 闹钟服务 -->
         <service
-            android:name=".alarm.AlarmService"
+            android:name=".service.AlarmService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
         
