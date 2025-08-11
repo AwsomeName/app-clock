@@ -39,7 +39,7 @@ class MainViewModel @Inject constructor(
                 val id = repository.insertAlarm(alarm)
                 val newAlarm = alarm.copy(id = id)
                 if (newAlarm.isEnabled) {
-                    alarmManager.scheduleAlarm(newAlarm)
+                    alarmManager.setAlarm(newAlarm)
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -59,7 +59,7 @@ class MainViewModel @Inject constructor(
                 
                 // 如果启用，重新调度
                 if (alarm.isEnabled) {
-                    alarmManager.scheduleAlarm(alarm)
+                    alarmManager.setAlarm(alarm)
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -89,7 +89,7 @@ class MainViewModel @Inject constructor(
                 repository.updateAlarm(updatedAlarm)
                 
                 if (updatedAlarm.isEnabled) {
-                    alarmManager.scheduleAlarm(updatedAlarm)
+                    alarmManager.setAlarm(updatedAlarm)
                 } else {
                     alarmManager.cancelAlarm(alarm.id)
                 }
@@ -114,7 +114,7 @@ class MainViewModel @Inject constructor(
                     nextTime.add(java.util.Calendar.DAY_OF_YEAR, 1)
                     
                     // 创建新的闹钟时间并重新调度
-                    alarmManager.scheduleAlarm(alarm)
+                    alarmManager.setAlarm(alarm)
                 } else {
                     // 一次性闹钟直接禁用
                     toggleAlarm(alarm)

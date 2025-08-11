@@ -362,11 +362,11 @@ fun AlarmDialog(
         ringtoneUri = null,
         vibrate = true,
         snoozeEnabled = true,
-        snoozeInterval = 5,
-        snoozeTimes = 3,
-        skipEnabled = true,
+        snoozeDuration = 10,
+        volume = 50,
         createdAt = System.currentTimeMillis(),
-        nextAlarmTime = 0L
+        isOneTime = false,
+        specificDate = null
     )
     
     var currentAlarm by remember { mutableStateOf(defaultAlarm) }

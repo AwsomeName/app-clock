@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.clockapp.alarm.AlarmScheduler
+import com.clockapp.utils.AlarmScheduler
 import com.clockapp.data.model.Alarm
 import com.clockapp.service.AlarmService
 import kotlinx.serialization.json.Json

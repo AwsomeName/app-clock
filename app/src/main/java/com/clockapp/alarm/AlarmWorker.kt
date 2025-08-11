@@ -2,7 +2,7 @@ package com.clockapp.alarm
 
 import android.content.Context
 import androidx.work.*
-import com.clockapp.data.database.AlarmDatabase
+import com.clockapp.data.AlarmDatabase
 import com.clockapp.data.model.Alarm
 import com.clockapp.data.repository.AlarmRepository
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
 class AlarmWorker(
     context: Context,
@@ -28,7 +30,7 @@ class AlarmWorker(
 
                 // 为每个闹钟安排下一次响铃
                 for (alarm in enabledAlarms) {
-                    clockAlarmManager.scheduleAlarm(alarm)
+                    clockAlarmManager.setAlarm(alarm)
                 }
 
                 Result.success()

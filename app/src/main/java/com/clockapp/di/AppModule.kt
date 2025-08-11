@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.clockapp.alarm.ClockAlarmManager
 import com.clockapp.data.dao.AlarmDao
-import com.clockapp.data.database.AlarmDatabase
+import com.clockapp.data.AlarmDatabase
 import com.clockapp.data.repository.AlarmRepository
 import dagger.Module
 import dagger.Provides

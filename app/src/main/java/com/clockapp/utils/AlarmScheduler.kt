@@ -27,7 +27,7 @@ object AlarmScheduler {
      * 安排闹钟
      */
     fun scheduleAlarm(context: Context, alarm: Alarm) {
-        if (!alarm.enabled) {
+        if (!alarm.isEnabled) {
             Log.d(TAG, "闹钟已禁用，不进行调度: ${alarm.id}")
             return
         }
@@ -108,7 +108,7 @@ object AlarmScheduler {
         val alarms = SampleData.generateSampleAlarms()
         
         for (alarm in alarms) {
-            if (alarm.enabled) {
+            if (alarm.isEnabled) {
                 scheduleAlarm(context, alarm)
             }
         }
@@ -129,7 +129,7 @@ object AlarmScheduler {
         val alarms = SampleData.generateSampleAlarms()
         
         for (alarm in alarms) {
-            if (alarm.enabled) {
+            if (alarm.isEnabled) {
                 // 先取消，再重新安排
                 cancelAlarm(context, alarm)
                 scheduleAlarm(context, alarm)

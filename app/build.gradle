@@ -43,7 +43,7 @@ android {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion '1.5.1'
+        kotlinCompilerExtensionVersion '1.4.8'
     }
     packagingOptions {
         resources {
@@ -82,6 +82,7 @@ dependencies {
     
     // WorkManager for alarm scheduling
     implementation 'androidx.work:work-runtime-ktx:2.9.0'
+    implementation 'androidx.hilt:hilt-work:1.1.0'  // 添加这一行
     
     // Permission handling
     implementation 'com.google.accompanist:accompanist-permissions:0.34.0'

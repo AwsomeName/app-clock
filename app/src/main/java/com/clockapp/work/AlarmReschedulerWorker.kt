@@ -23,7 +23,7 @@ class AlarmReschedulerWorker(
             // 获取所有已启用的闹钟并重新安排
             // 这里为了简化示例，使用SampleData获取示例闹钟
             val alarms = SampleData.generateSampleAlarms()
-                .filter { it.enabled }
+                .filter { it.isEnabled }
             
             Log.d(TAG, "找到${alarms.size}个已启用的闹钟需要重新安排")
             

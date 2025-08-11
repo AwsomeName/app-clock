@@ -1,3 +1,5 @@
+package com.clockapp.alarm
+
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -36,7 +38,7 @@ class ClockAlarmManager @Inject constructor(
         )
 
         // 设置闹钟时间
-        val alarmTime = alarm.getNextAlarmTime()?.timeInMillis ?: return
+        val alarmTime = alarm.getNextAlarmTime().timeInMillis
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager.canScheduleExactAlarms()) {

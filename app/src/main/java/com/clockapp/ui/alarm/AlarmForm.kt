@@ -178,30 +178,18 @@ fun AlarmForm(
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Text(
-                        text = "延迟间隔: ${alarm.snoozeInterval} 分钟",
+                        text = "延迟间隔: ${alarm.snoozeDuration} 分钟",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                     
                     Slider(
-                        value = alarm.snoozeInterval.toFloat(),
-                        onValueChange = { onAlarmChanged(alarm.copy(snoozeInterval = it.toInt())) },
+                        value = alarm.snoozeDuration.toFloat(),
+                        onValueChange = { onAlarmChanged(alarm.copy(snoozeDuration = it.toInt())) },
                         valueRange = 1f..30f,
                         steps = 29
                     )
-                    
-                    Text(
-                        text = "延迟次数: ${alarm.snoozeTimes} 次",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                    
-                    Slider(
-                        value = alarm.snoozeTimes.toFloat(),
-                        onValueChange = { onAlarmChanged(alarm.copy(snoozeTimes = it.toInt())) },
-                        valueRange = 1f..5f,
-                        steps = 4
-                    )
+
                 }
             }
         }
@@ -382,7 +370,7 @@ fun RingtoneSelector(
     val context = LocalContext.current
     val defaultRingtone = RingtoneManager.getActualDefaultRingtoneUri(
         context, RingtoneManager.TYPE_ALARM
-    ).toString()
+    )?.toString() ?: ""
     
     val ringtoneOptions = remember {
         listOf(
@@ -393,7 +381,7 @@ fun RingtoneSelector(
     }
     
     var selectedRingtoneUri by remember {
-        mutableStateOf(currentRingtoneUri ?: defaultRingtone)
+        mutableStateOf<String?>(currentRingtoneUri ?: defaultRingtone)
     }
     
     Card(

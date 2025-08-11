@@ -26,7 +26,7 @@ class BootReceiver : BroadcastReceiver() {
             }
             
             // 启动工作器重新调度所有闹钟
-            AlarmWorker.scheduleDaily(context)
+            AlarmWorker.schedule(context)
             
             Log.d(TAG, "已启动闹钟工作器重新调度闹钟")
         }
